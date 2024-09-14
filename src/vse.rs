@@ -1,5 +1,5 @@
 use crate::into::SecpError;
-use secp::{MaybeScalar, Point, Scalar};
+use secp::{MaybePoint, MaybeScalar, Point, Scalar};
 
 pub fn vse_encryption_secret(self_secret: Scalar, to_public: Point) -> Scalar {
     let secret_point = self_secret * to_public;
@@ -41,4 +41,18 @@ pub fn vse_decrypt(
         MaybeScalar::Valid(scalar) => Ok(scalar),
         MaybeScalar::Zero => Err(SecpError::InvalidScalar),
     }
+}
+
+pub fn vse_verify(
+    encrypted_share_scalar: Scalar,
+    public_share_point: Point,
+    encryption_point: Point,
+) -> bool {
+    let combined_point = encrypted_share_scalar.base_point_mul();
+
+    combined_point
+        == match public_share_point + encryption_point {
+            MaybePoint::Valid(point) => point,
+            MaybePoint::Infinity => return false,
+        }
 }
