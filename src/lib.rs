@@ -4,3 +4,4 @@ pub mod lagrance;
 pub mod schnorr;
 pub mod secret;
 pub mod vss;
+pub mod vse;
