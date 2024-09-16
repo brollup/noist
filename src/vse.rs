@@ -1,12 +1,14 @@
-use crate::into::SecpError;
+use crate::{hash::sha_256, into::SecpError};
 use secp::{MaybePoint, MaybeScalar, Point, Scalar};
 
 pub fn vse_encrypting_key_secret(self_secret: Scalar, to_public: Point) -> Scalar {
     let secret_point = self_secret * to_public;
 
-    let secret_point_xbytes = secret_point.serialize_xonly();
+    let secret_point_xbytes = secret_point.serialize_uncompressed();
 
-    let shared_secret = Scalar::reduce_from(&secret_point_xbytes);
+    let secret_point_hash = sha_256(&secret_point_xbytes);
+
+    let shared_secret = Scalar::reduce_from(&secret_point_hash);
 
     shared_secret
 }
